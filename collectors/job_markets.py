@@ -45,6 +45,7 @@ def _boss():
 
             seo = data.get("zpData", {}).get("seoData")
             if not seo:
+                print(f"    Boss[{city_name}] seoData为空, keys={list(data.keys())[:5]}")
                 continue
             hot_jobs = seo.get("hotJobs", [])
             hot_brands = seo.get("hotBrands", [])
