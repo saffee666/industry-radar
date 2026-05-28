@@ -36,9 +36,11 @@ def _boss():
                 timeout=15
             )
             if resp.status_code != 200:
+                print(f"    Boss[{city_name}] HTTP {resp.status_code}")
                 continue
             data = resp.json()
             if data.get("code") != 0:
+                print(f"    Boss[{city_name}] API code={data.get('code')} msg={data.get('message','')}")
                 continue
 
             seo = data.get("zpData", {}).get("seoData")
