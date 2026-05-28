@@ -24,6 +24,17 @@ industries:
       - "TensorFlow|PyTorch|JAX|HuggingFace"
       - "自动驾驶|无人驾驶|智能驾驶|ADAS"
       - "机器人|具身智能|人形机器人"
+      - "智能助手|AI助手|AI搜索|AI搜索"
+      - "AI编程|代码生成|AI写代码|copilot|cursor"
+      - "AI绘图|AI绘画|AI画图|AI图片|AI图像"
+      - "AI写作|AI写文章|AI文案|AI翻译"
+      - "AI客服|智能客服|AI外呼"
+      - "数字人|虚拟人|AI主播|AI分身"
+      - "Sora|Suno|Udio|Midjourney|Stable Diffusion|DALL"
+      - "开源大模型|开源模型|模型开源|权重开源"
+      - "token|context.*window|上下文窗口"
+      - "幻觉|hallucination|对齐|alignment|安全对齐"
+      - "百模大战|模型价格战|模型降价|token降价"
     keywords_en:
       - "large language model|LLM|GPT|Claude|Gemini"
       - "AI agent|autonomous agent"
@@ -36,6 +47,8 @@ industries:
       - "text.to.speech|speech.to.text|voice.*model"
       - "coding agent|agent.*team|agent.*platform"
       - "AI.*workflow|AI.*tool|AI.*assistant"
+      - "copilot|cursor|code.*generation|AI.*code"
+      - "midjourney|stable.*diffusion|dall.?e|sora"
 
   ecommerce:
     name: "电商/零售"
@@ -51,11 +64,18 @@ industries:
       - "美团|饿了么|盒马|顺丰|菜鸟|达达|闪送"
       - "零食|折扣店|奥特乐|好特卖|零食很忙"
       - "外卖|O2O|本地生活|同城零售"
+      - "双11|双十一|618|年货节|电商节|大促"
+      - "直播|带货|主播|直播间|GMV|流量|转化率"
+      - "商品卡|详情页|主图|标题优化|SEO优化"
+      - "一件代发|无货源|店群|铺货"
+      - "阿里妈妈|直通车|引力魔方|万象台|万相台"
+      - "闲鱼|转转|二手|闲置|以旧换新"
     keywords_en:
       - "e.?commerce|DTC|direct.to.consumer"
       - "Amazon|Shopify|Shopee|TikTok Shop"
       - "dropshipping|cross.?border.*commerce"
       - "supply chain|logistics|fulfillment"
+      - "live.*shopping|social.*commerce|GMV"
 
   web3:
     name: "Web3/Crypto"
@@ -69,6 +89,9 @@ industries:
       - "DAO|去中心化自治"
       - "钱包|Metamask|链上|链游|GameFi"
       - "Meme币|MEME|土狗"
+      - "Web3|web3|DApp|dapp|去中心化"
+      - "空投|airdrop|撸毛|白名单|mint"
+      - "稳定币|USDT|USDC|DAI|算法稳定币"
     keywords_en:
       - "blockchain|crypto|DeFi|NFT|Web3"
       - "Bitcoin|Ethereum|Solana|Layer.?2"
@@ -89,6 +112,12 @@ industries:
       - "视频剪辑|拍摄|摄影|后期制作|特效"
       - "字幕|配音|翻译|字幕组"
       - "自媒体运营|公众号|头条号|百家号"
+      - "网红|涨粉|粉丝|流量变现|内容变现"
+      - "短剧出海|短剧平台|短剧制作|剧本杀"
+      - "影视|电影|电视剧|综艺|网剧|网络剧"
+      - "UP主|创作者|投稿|播放量|点赞"
+      - "抖音短剧|快手短剧|小程序短剧"
+      - "编剧软件|剧本生成|AI编剧|AI写剧本"
     keywords_en:
       - "short drama|micro.drama|vertical series"
       - "content creator|influencer|KOL|MCN"
@@ -119,6 +148,11 @@ industries:
       - "后端工程师|前端工程师|iOS|Android.*开发|鸿蒙"
       - "架构师|技术总监|CTO|运维|DevOps|SRE"
       - "平台开发|系统开发|工具开发|SDK"
+      - "飞书|钉钉|企业微信|teams|slack|notion"
+      - "云计算|云服务|云平台|阿里云|腾讯云|华为云|AWS|Azure|GCP"
+      - "开源项目|github|gitlab|开源社区|星标|star|fork"
+      - "技术栈|技术选型|架构设计|系统设计|高并发|分布式"
+      - "程序员|开发者|工程师|码农|技术人|IT人"
     keywords_en:
       - "SaaS|B2B|enterprise|PLG|DevTools"
       - "open source.*commercial|OSS.*business"
@@ -137,6 +171,9 @@ industries:
       - "本地化|本地化运营|文化差异|合规"
       - "跨境支付|国际物流|海外仓"
       - "汇率|关税|贸易政策|出口管制"
+      - "TikTok|Temu|SHEIN|速卖通|AliExpress"
+      - "外贸|出口|进口|国际贸易|WTO"
+      - "翻译|多语言|国际化|i18n|本地化|l10n"
     keywords_en:
       - "global.*expansion|internationalization|cross.?border"
       - "Southeast Asia|Middle East|Latin America|LATAM"
@@ -156,6 +193,9 @@ industries:
       - "太阳能|风能|生物质能|地热|潮汐能"
       - "宁德时代|比亚迪|特斯拉|蔚来|理想|小鹏|隆基|阳光电源|通威|晶科"
       - "汽车制造|整车|零部件|动力电池|电驱动"
+      - "小米汽车|华为汽车|问界|极氪|零跑|哪吒|高合"
+      - "油价|汽油|柴油|充电|续航|电池.*寿命|电池.*衰减"
+      - "绿色|节能|减排|低碳|环保|可持续"
     keywords_en:
       - "renewable energy|solar|battery|EV|electric vehicle"
       - "carbon neutral|ESG|energy storage|hydrogen"
@@ -171,9 +211,14 @@ industries:
       - "户外|露营|运动|健身|健康"
       - "折扣零售|临期|拼团|社区商业"
       - "喜茶|瑞幸|蜜雪冰城|霸王茶姬|奈雪|海底捞|泡泡玛特|名创优品"
+      - "奶茶|柠檬茶|果茶|酸奶|冰淇淋|零食|螺蛳粉|预制菜"
+      - "化妆品|护肤品|精华|面膜|防晒|口红|香水"
+      - "潮牌|联名|限定|快闪|popup|pop.?up"
+      - "探店|打卡|网红店|排队|爆款|限购"
     keywords_en:
       - "consumer brand|DTC brand|CPG|FMCG"
       - "food.*tech|beauty.*brand|pet.*economy"
+      - "bubble.*tea|coffee.*chain|cosmetics"
 
   health:
     name: "医疗健康"
@@ -186,9 +231,14 @@ industries:
       - "老龄化|养老|康复|护理|慢病管理"
       - "凯莱英|药明康德|恒瑞|迈瑞|百济神州|联影|华大|辉瑞|罗氏|默沙东"
       - "护士|医生|药剂师|临床|医学|制药"
+      - "减肥药|GLP.?1|司美格鲁肽|替尔泊肽"
+      - "体检|疫苗接种|流感|疫情|病毒|抗体"
+      - "医美|整形|美容|皮肤管理|牙齿矫正|近视手术"
+      - "心理|抑郁|焦虑|失眠|冥想|正念"
     keywords_en:
       - "biotech|pharma|medtech|digital health|telemedicine"
       - "drug discovery|clinical trial|FDA|gene therapy"
+      - "GLP.?1|semaglutide|weight.?loss|ozempic"
 
   fintech:
     name: "金融科技"
@@ -202,10 +252,16 @@ industries:
       - "风控|征信|信贷|借贷|P2P|众筹"
       - "股票|炒股|投资|理财|基金定投"
       - "富途|东方财富|同花顺|蚂蚁集团|微众银行|陆金所|众安|老虎证券"
+      - "A股|港股|美股|IPO|上市|涨停|跌停|牛市|熊市"
+      - "大盘|指数|沪深|上证|深证|创业板|科创板"
+      - "央行|降息|加息|存款利率|贷款利率|LPR"
+      - "比特币|以太坊|加密货币|币价|矿机"
+      - "支付|支付宝|微信支付|云闪付|扫码支付|刷脸支付"
     keywords_en:
       - "fintech|insurtech|digital payment|BNPL"
       - "neobank|open banking|embedded finance"
       - "finance|trading|investing|banking|crypto"
+      - "stock.*market|IPO|interest.*rate|central.*bank"
 
   gaming:
     name: "游戏"
@@ -219,6 +275,8 @@ industries:
       - "游戏开发|游戏策划|游戏美术|游戏运营|游戏设计"
       - "游戏UI|游戏引擎|Unity|Unreal|UE5|Cocos"
       - "动作游戏|射击|RPG|策略游戏|休闲游戏"
+      - "原神|崩坏|王者荣耀|和平精英|黑神话|悟空"
+      - "Steam|Epic|Xbox|PlayStation|Switch|掌机"
     keywords_en:
       - "gaming|video game|mobile game|AAA game"
       - "game.*industry|esports|cloud gaming|UGC"
@@ -233,9 +291,13 @@ industries:
       - "知识付费|付费社群|训练营|课程"
       - "素质教育|编程教育|少儿编程"
       - "终身学习|成人教育|企业培训"
+      - "高考|中考|省考|国考|雅思|托福|留学"
+      - "网课|公开课|MOOC|在线学习|自学"
+      - "教师|老师|教授|讲师|助教|辅导员"
     keywords_en:
       - "edtech|online.*learning|education.*AI"
       - "skill.*training|coding.*bootcamp|upskilling"
+      - "MOOC|course.*platform|learning.*platform"
 
   other:
     name: "其他"

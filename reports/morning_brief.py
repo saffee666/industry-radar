@@ -15,7 +15,7 @@ def _priority_group(score):
     return "low"
 
 
-MAX_PER_SECTION = {"high": 25, "mid": 40, "low": 50}
+MAX_PER_SECTION = {"high": 20, "mid": 30, "low": 50}
 
 
 def generate_brief(signals, date_str=None):

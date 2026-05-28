@@ -53,7 +53,7 @@ def cmd_collect(args):
     _p(f"\n[统计] 总计采集: {len(all_signals)} 条原始信号")
 
     date_str = datetime.now().strftime("%Y-%m-%d")
-    raw_file = PROJECT_ROOT / "output" / "raw" / f"signals_{date_str}.json"
+    raw_file = Path("D:/claude产出/industry-radar/raw") / f"signals_{date_str}.json"
     raw_file.parent.mkdir(parents=True, exist_ok=True)
     raw_file.write_text(json.dumps(all_signals, ensure_ascii=False, indent=2), encoding="utf-8")
     _p(f"[保存] 原始数据已保存: {raw_file}")
@@ -64,7 +64,7 @@ def cmd_collect(args):
 def cmd_process(args):
     """信号处理：去重 + 分类 + 打分"""
     date_str = args.date or datetime.now().strftime("%Y-%m-%d")
-    raw_file = PROJECT_ROOT / "output" / "raw" / f"signals_{date_str}.json"
+    raw_file = Path("D:/claude产出/industry-radar/raw") / f"signals_{date_str}.json"
 
     if not raw_file.exists():
         _p(f"[ERROR] 未找到 {date_str} 的原始数据，请先运行 collect")
@@ -86,7 +86,7 @@ def cmd_process(args):
     scored = score_signals(classified)
     _p(f"[评分] 排序完成")
 
-    processed_file = PROJECT_ROOT / "output" / "raw" / f"processed_{date_str}.json"
+    processed_file = Path("D:/claude产出/industry-radar/raw") / f"processed_{date_str}.json"
     processed_file.write_text(json.dumps(scored, ensure_ascii=False, indent=2), encoding="utf-8")
     _p(f"[保存] 处理后数据: {processed_file}")
 
@@ -101,7 +101,7 @@ def cmd_process(args):
 def cmd_brief(args):
     """生成晨报"""
     date_str = args.date or datetime.now().strftime("%Y-%m-%d")
-    processed_file = PROJECT_ROOT / "output" / "raw" / f"processed_{date_str}.json"
+    processed_file = Path("D:/claude产出/industry-radar/raw") / f"processed_{date_str}.json"
 
     if not processed_file.exists():
         _p(f"[ERROR] 未找到 {date_str} 的处理后数据，请先运行 process")
@@ -117,7 +117,7 @@ def cmd_brief(args):
 def cmd_analyze(args):
     """深度分析选中信号"""
     date_str = args.date or datetime.now().strftime("%Y-%m-%d")
-    processed_file = PROJECT_ROOT / "output" / "raw" / f"processed_{date_str}.json"
+    processed_file = Path("D:/claude产出/industry-radar/raw") / f"processed_{date_str}.json"
 
     if not processed_file.exists():
         _p(f"[ERROR] 未找到 {date_str} 的处理后数据，请先运行 process")

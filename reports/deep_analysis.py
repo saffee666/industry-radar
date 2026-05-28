@@ -1,310 +1,317 @@
-"""深度分析引擎：选中信号 → 多源交叉验证 → AI分析 → 日报"""
+"""深度分析引擎 v2：选中信号 → 多源交叉验证 → 结构化分析 → 日报"""
 
 import json
 import re
-import subprocess
-import sys
 from datetime import datetime
 from pathlib import Path
 from collections import defaultdict
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
-# Windows GBK 终端兼容
-def _safe_print(*args, **kwargs):
-    try:
-        print(*args, **kwargs)
-    except UnicodeEncodeError:
-        print(*(str(a).encode('ascii', errors='replace').decode('ascii') for a in args), **kwargs)
+OUTPUT_DIR = Path("D:/claude产出/industry-radar/reports")
 
-PROJECT_ROOT = Path(__file__).parent.parent
+# === 搜索验证 ===
 
-
-def _search_cross_validate(signal, max_results=5):
-    """用DDG + Bing搜索做交叉验证，返回补充信息"""
-    title = signal.get("title", "")
-    industry = signal.get("industry_name", "")
-
-    results = {"ddg": [], "bing": [], "playwright_sources": []}
-
-    # 使用 DDG 搜索交叉验证
-    ddgs_module = None
-    try:
-        from ddgs import DDGS as _DDGS1
-        ddgs_module = _DDGS1
-    except ImportError:
+def _search_ddg(query, max_results=5):
+    """DDG 搜索，返回结果列表"""
+    results = []
+    for lib in ("ddgs", "duckduckgo_search"):
         try:
-            from duckduckgo_search import DDGS as _DDGS2
-            ddgs_module = _DDGS2
-        except ImportError:
-            pass
-
-    if ddgs_module:
-        try:
-            with ddgs_module() as ddgs:
-                r = list(ddgs.text(f"{title} {industry}", max_results=max_results))
-                results["ddg"] = [{"title": x.get("title", ""), "url": x.get("href", ""), "snippet": x.get("body", "")} for x in r]
+            module = __import__(lib, fromlist=["DDGS"])
+            with module.DDGS() as ddgs:
+                for r in ddgs.text(query, max_results=max_results):
+                    results.append({
+                        "title": r.get("title", ""),
+                        "url": r.get("href", ""),
+                        "snippet": r.get("body", "")[:200],
+                    })
+            if results:
+                break
         except Exception:
-            pass
-
+            continue
     return results
 
 
-def _analyze_signal_with_claude(signal, cross_refs):
-    """使用 Claude 分析单个信号——调用 claude CLI（非交互模式）"""
+def _cross_validate(signal):
+    """对单条信号做多源搜索验证"""
     title = signal.get("title", "")
-    snippet = signal.get("snippet", "")
     industry = signal.get("industry_name", "")
-    stype = signal.get("signal_type_name", "")
-    score = signal.get("score", 0)
-    url = signal.get("url", "")
-    metadata = signal.get("metadata", {})
 
-    # 构建分析prompt
-    prompt_parts = [
-        f"分析以下行业信号，用中文回答，结构如下：",
-        f"",
-        f"信号: {title}",
-        f"行业: {industry} | 信号类型: {stype} | 评分: {score}/10",
-        f"来源: {url}",
-        f"摘要: {snippet}",
-        f"元数据: {json.dumps(metadata, ensure_ascii=False)}",
-        f"",
-        f"请按以下6段输出分析（每段2-4句，简洁有力）：",
-        f"",
-        f"1. **事实确认**: 这个信号是否可靠？从多个来源交叉验证的结果如何？",
-        f"2. **商业解读**: 这个变化为什么重要？背后的商业逻辑是什么？",
-        f"3. **机会评估**: 对于个人/小团队/小公司有什么机会？市场规模如何？入场时机是否合适？",
-        f"4. **行动建议**: 具体可以做什么？第一步是什么？需要什么资源和技能？",
-        f"5. **风险提示**: 有什么不确定因素？可能的风险是什么？",
-        f"6. **持续追踪**: 接下来需要关注什么指标/信号来验证这个趋势？",
+    queries = [
+        title[:80],
+        f"{title[:60]} {industry}",
     ]
+    all_results = []
 
-    prompt = "\n".join(prompt_parts)
+    for q in queries:
+        ddg_results = _search_ddg(q, max_results=3)
+        all_results.extend(ddg_results)
 
-    # 尝试通过 claude CLI 调用
-    try:
-        result = subprocess.run(
-            ["claude", "-p", prompt, "--print", "--output-format", "text", "--max-tokens", "1500"],
-            capture_output=True, text=True, timeout=120, cwd=str(PROJECT_ROOT)
-        )
-        if result.returncode == 0 and result.stdout.strip():
-            return prompt, result.stdout.strip()
-    except FileNotFoundError:
-        pass
-    except Exception as e:
-        _safe_print(f"   Claude调用异常: {e}")
-
-    # Fallback: 返回prompt供手动分析
-    return prompt, None
+    # 去重
+    seen = set()
+    unique = []
+    for r in all_results:
+        if r["url"] not in seen:
+            seen.add(r["url"])
+            unique.append(r)
+    return unique[:8]
 
 
-def _generate_chart_data(signals):
-    """生成图表数据（行业分布饼图 + 评分分布直方图）"""
-    import matplotlib
-    matplotlib.use("Agg")
-    import matplotlib.pyplot as plt
-    import matplotlib.font_manager as fm
-    import numpy as np
+# === 信号预处理 ===
 
-    date_str = datetime.now().strftime("%Y-%m-%d")
-    chart_dir = PROJECT_ROOT / "output" / "reports" / f"charts_{date_str}"
-    chart_dir.mkdir(parents=True, exist_ok=True)
+def _extract_keywords(title, snippet="", max_kw=6):
+    """从标题提取关键词用于搜索"""
+    text = f"{title} {snippet}"
+    # 提取中文词组（2-4字连续）
+    zh_words = re.findall(r'[\u4e00-\u9fff]{2,4}', text)
+    # 提取英文单词（3+字母）
+    en_words = re.findall(r'[a-zA-Z]{3,}', text)
 
-    # 找中文字体
-    zh_fonts = [f for f in fm.fontManager.ttflist if any(
-        k in f.name.lower() for k in ["simhei", "simsun", "microsoft yahei", "noto sans cjk", "wenquanyi", "source han", "heiti", "songti"]
-    )]
-    if zh_fonts:
-        font_family = zh_fonts[0].name
-        font_prop = fm.FontProperties(family=font_family)
-        plt.rcParams['font.sans-serif'] = [font_family, 'DejaVu Sans']
-        plt.rcParams['axes.unicode_minus'] = False
-    else:
-        font_prop = None
+    # 去重并过滤停用词
+    stopwords = {"一个", "这个", "那个", "什么", "怎么", "为什么", "可以", "没有",
+                 "已经", "还是", "只是", "如果", "因为", "所以", "但是", "然而",
+                 "the", "and", "for", "that", "this", "with", "from", "have"}
+    keywords = []
+    seen = set()
+    for w in zh_words + en_words:
+        wl = w.lower()
+        if wl not in stopwords and wl not in seen:
+            seen.add(wl)
+            keywords.append(w)
+    return keywords[:max_kw]
 
-    # 1. 行业分布饼图
-    industries = defaultdict(int)
-    for s in signals:
-        industries[s.get("industry_name", "其他")] += 1
 
-    fig, axes = plt.subplots(1, 2, figsize=(14, 5))
-
-    labels = list(industries.keys())
-    sizes = list(industries.values())
-    colors = plt.cm.Set3(np.linspace(0, 1, len(labels)))
-
-    wedges, texts, autotexts = axes[0].pie(
-        sizes, labels=labels, autopct="%1.1f%%",
-        colors=colors, startangle=90,
-        textprops={"fontproperties": font_prop} if font_prop else {}
-    )
-    axes[0].set_title("行业分布", fontproperties=font_prop if font_prop else None, fontsize=14)
-
-    # 2. 评分分布直方图
-    scores = [s.get("score", 0) for s in signals]
-    axes[1].hist(scores, bins=10, color="#4A90D9", edgecolor="white", alpha=0.8)
-    axes[1].set_xlabel("评分", fontproperties=font_prop if font_prop else None)
-    axes[1].set_ylabel("信号数量", fontproperties=font_prop if font_prop else None)
-    axes[1].set_title("信号评分分布", fontproperties=font_prop if font_prop else None, fontsize=14)
-    axes[1].axvline(x=7.0, color="red", linestyle="--", alpha=0.5, label="高优线")
-    axes[1].legend()
-
-    plt.tight_layout()
-    chart_path = chart_dir / f"overview_{date_str}.png"
-    plt.savefig(chart_path, dpi=150, bbox_inches="tight")
-    plt.close()
-
-    return str(chart_dir)
-
+# === 主分析函数 ===
 
 def analyze_signals(selected_signals, date_str=None):
-    """深度分析选中信号，生成日报Markdown"""
+    """深度分析选中信号，生成日报Markdown和搜索提示"""
     if date_str is None:
         date_str = datetime.now().strftime("%Y-%m-%d")
 
-    _safe_print(f"\n[深度分析] {len(selected_signals)} 条信号...")
-
-    # 生成概览图表
-    try:
-        chart_dir = _generate_chart_data(selected_signals)
-        _safe_print(f"[图表] 已生成: {chart_dir}")
-    except Exception as e:
-        _safe_print(f"[图表] 生成失败: {e}")
-        chart_dir = None
+    print(f"\n[深度分析] {len(selected_signals)} 条信号")
 
     # 按行业分组
     by_industry = defaultdict(list)
     for s in selected_signals:
         by_industry[s.get("industry_name", "其他")].append(s)
 
-    # 生成日报
     lines = []
-    lines.append(f"# 📊 行业雷达深度日报 — {date_str}")
+    lines.append(f"# 行业雷达深度日报 — {date_str}")
+    lines.append("")
+    lines.append(f"> 分析信号数: {len(selected_signals)} | 覆盖行业: {len(by_industry)}")
+    lines.append(f"> 生成时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     lines.append("")
 
-    # 执行摘要
+    # === 执行摘要 ===
     lines.append("## 执行摘要")
     lines.append("")
 
-    high_priority = [s for s in selected_signals if s.get("score", 0) >= 7.0]
-    top_industries = sorted(by_industry.keys(), key=lambda k: len(by_industry[k]), reverse=True)[:5]
-    top_types = defaultdict(int)
+    high = [s for s in selected_signals if s.get("score", 0) >= 8.0]
+    mid = [s for s in selected_signals if 6.0 <= s.get("score", 0) < 8.0]
+    top_inds = sorted(by_industry.keys(), key=lambda k: len(by_industry[k]), reverse=True)[:5]
+    type_counts = defaultdict(int)
     for s in selected_signals:
-        top_types[s.get("signal_type_name", "")] += 1
-    top_type = max(top_types, key=top_types.get) if top_types else ""
+        type_counts[s.get("signal_type_name", "")] += 1
+    top_type = max(type_counts, key=type_counts.get) if type_counts else ""
 
-    lines.append(f"今日深度分析 **{len(selected_signals)}** 条信号，覆盖 **{len(by_industry)}** 个行业。")
-    if high_priority:
-        lines.append(f"其中高优先级信号 **{len(high_priority)}** 条，涉及 {', '.join(top_industries[:3])} 等行业。")
-    lines.append(f"信号类型以 **{top_type}** 为主。")
+    lines.append(f"今日选中 **{len(selected_signals)}** 条信号深度分析。")
+    lines.append(f"其中高优先级 **{len(high)}** 条（≥8.0），中优先级 **{len(mid)}** 条（6.0-7.9）。")
+    lines.append(f"覆盖行业: {'、'.join(top_inds)}。")
+    lines.append(f"信号类型以 **{top_type}** 为主（{type_counts.get(top_type, 0)} 条）。")
     lines.append("")
 
-    # 信号类型概览
-    lines.append("### 信号类型分布")
-    lines.append("")
-    for stype, count in sorted(top_types.items(), key=lambda x: -x[1]):
-        lines.append(f"- **{stype}**: {count} 条")
+    # 信号类型分布
+    lines.append("### 类型概览")
+    for st, cnt in sorted(type_counts.items(), key=lambda x: -x[1]):
+        bar = "█" * min(cnt, 20)
+        lines.append(f"- {st}: {bar} ({cnt})")
     lines.append("")
 
-    if chart_dir:
-        lines.append(f"![行业概览](charts_{date_str}/overview_{date_str}.png)")
-        lines.append("")
-
+    # 行业概览
+    lines.append("### 行业分布")
+    for ind in top_inds:
+        ind_signals = by_industry[ind]
+        avg_score = sum(s.get("score", 0) for s in ind_signals) / len(ind_signals)
+        lines.append(f"- **{ind}**: {len(ind_signals)} 条，均分 {avg_score:.1f}")
+    lines.append("")
     lines.append("---")
     lines.append("")
 
-    # 按行业逐条分析
+    # === 逐条深度分析 ===
+    signal_num = 0
     for industry in sorted(by_industry.keys()):
-        industry_signals = by_industry[industry]
-        lines.append(f"## {industry}")
+        ind_signals = by_industry[industry]
+        lines.append(f"## {industry} ({len(ind_signals)} 条)")
         lines.append("")
 
-        for i, signal in enumerate(industry_signals, 1):
+        for signal in ind_signals:
+            signal_num += 1
             title = signal.get("title", "")
             stype = signal.get("signal_type_name", "")
             score = signal.get("score", 0)
             snippet = signal.get("snippet", "")
             url = signal.get("url", "")
+            source_name = signal.get("source_name", "")
             metadata = signal.get("metadata", {})
 
-            lines.append(f"### 信号 {i}: {title}")
+            lines.append(f"### #{signal_num} [{score:.1f}分] [{stype}] {title}")
             lines.append("")
-            lines.append(f"**类型**: {stype} | **评分**: {score}/10")
-            lines.append(f"**来源**: [{signal.get('source_name', '')}]({url})")
+            lines.append(f"**来源**: {source_name} | **链接**: {url}")
+            if snippet:
+                lines.append(f"**摘要**: {snippet}")
+            lines.append("")
+
+            # 关键词
+            kw = _extract_keywords(title, snippet)
+            lines.append(f"**关键词**: {' · '.join(kw) if kw else '(未提取到)'}")
             lines.append("")
 
             # 交叉验证
-            lines.append("#### 📡 多源交叉验证")
+            lines.append("#### 多源交叉验证")
+            lines.append("")
             try:
-                cross_refs = _search_cross_validate(signal)
-                if cross_refs.get("ddg"):
-                    lines.append("来自 DuckDuckGo 的验证结果:")
-                    for ref in cross_refs["ddg"][:3]:
-                        lines.append(f"- [{ref['title'][:50]}]({ref['url']}): {ref['snippet'][:100]}")
+                refs = _cross_validate(signal)
+                if refs:
+                    for j, ref in enumerate(refs[:5], 1):
+                        lines.append(f"{j}. [{ref['title'][:80]}]({ref['url']})")
+                        if ref.get("snippet"):
+                            lines.append(f"   > {ref['snippet'][:150]}")
+                    lines.append("")
                 else:
-                    lines.append("（DDG验证未返回结果，建议手动验证）")
-            except Exception:
-                lines.append("（交叉验证暂不可用）")
-            lines.append("")
-
-            # AI分析
-            lines.append("#### 🤖 AI深度分析")
-            lines.append("")
-            prompt, analysis = _analyze_signal_with_claude(signal, None)
-
-            if analysis:
-                lines.append(analysis)
-            else:
-                lines.append("> ⚠️ Claude CLI 未可用，以下为分析框架。可手动运行：")
-                lines.append("> ```")
-                lines.append(f"> claude -p \"分析行业信号: {title}\" --print")
-                lines.append("> ```")
+                    lines.append("*(DDG搜索未返回结果)*")
+                    lines.append("")
+            except Exception as e:
+                lines.append(f"*(搜索异常: {e})*")
                 lines.append("")
-                # 输出基本分析框架
-                lines.append("**事实确认**: 待验证")
-                lines.append("**商业解读**: 待分析")
-                lines.append("**机会评估**: 待评估")
-                lines.append("**行动建议**: 待生成")
-                lines.append("**风险提示**: 待评估")
-                lines.append("**持续追踪**: 待定义")
 
+            # 元数据
+            if metadata:
+                lines.append("#### 原始数据")
+                lines.append("")
+                meta_clean = {k: v for k, v in metadata.items() if v and v != 0}
+                if meta_clean:
+                    for k, v in list(meta_clean.items())[:5]:
+                        lines.append(f"- **{k}**: {v}")
+                lines.append("")
+
+            # 分析框架（供 AI 填充）
+            lines.append("#### 分析框架")
+            lines.append("")
+            lines.append("| 维度 | 分析 |")
+            lines.append("|------|------|")
+            lines.append("| **事实确认** | 待验证：该信号是否可靠？多源交叉验证结果？ |")
+            lines.append("| **商业解读** | 待分析：为什么重要？背后的商业逻辑？ |")
+            lines.append("| **机会评估** | 待评估：个人/小团队有什么机会？市场规模？入场时机？ |")
+            lines.append("| **行动建议** | 待生成：具体可做什么？第一步是什么？需要什么资源？ |")
+            lines.append("| **风险提示** | 待评估：不确定因素？可能的风险？ |")
+            lines.append("| **持续追踪** | 待定义：需关注什么指标来验证趋势？ |")
+            lines.append("")
+
+            # 搜索提示
+            lines.append("<details>")
+            lines.append("<summary>搜索提示词（点击展开）</summary>")
+            lines.append("")
+            for q_idx, q in enumerate(kw[:4], 1):
+                lines.append(f"- 搜索 {q_idx}: `{title[:40]} {q} 2026`")
+            lines.append(f"- 搜索 {q_idx+1}: `{title[:40]} 趋势 分析`")
+            lines.append(f"- 搜索 {q_idx+2}: `{title[:40]} 市场规模 机会`")
+            lines.append("")
+            lines.append("</details>")
             lines.append("")
             lines.append("---")
             lines.append("")
 
-    # 附录
-    lines.append("## 附录")
+    # === 综合行动清单 ===
+    lines.append("## 综合行动清单")
     lines.append("")
-    lines.append("### 全部信号索引")
+    lines.append("| 优先级 | 信号 | 建议行动 | 时间框架 |")
+    lines.append("|--------|------|----------|----------|")
+    for i, s in enumerate(selected_signals, 1):
+        score = s.get("score", 0)
+        pri = "🔴 高" if score >= 8 else ("🟡 中" if score >= 6 else "🟢 低")
+        lines.append(f"| {pri} | #{i} {s.get('title', '')[:40]} | 待填充 | - |")
     lines.append("")
-    lines.append("| # | 行业 | 类型 | 标题 | 评分 |")
+
+    # === 附录 ===
+    lines.append("## 附录: 信号索引")
+    lines.append("")
+    lines.append("| # | 评分 | 行业 | 类型 | 标题 |")
     lines.append("|---|------|------|------|------|")
     for i, s in enumerate(selected_signals, 1):
-        lines.append(f"| {i} | {s.get('industry_name', '')} | {s.get('signal_type_name', '')} | {s.get('title', '')[:50]} | {s.get('score', 0)} |")
+        lines.append(
+            f"| {i} | {s.get('score', 0):.1f} | {s.get('industry_name', '')} | "
+            f"{s.get('signal_type_name', '')} | {s.get('title', '')[:50]} |"
+        )
     lines.append("")
-
-    lines.append("### 数据来源清单")
-    sources = set(s.get("source_name", "") for s in selected_signals)
-    for src in sorted(sources):
-        lines.append(f"- {src}")
-    lines.append("")
-
-    lines.append(f"> 生成时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    lines.append(f"> 分析信号数: {len(selected_signals)} | 覆盖行业: {len(by_industry)}")
 
     report_md = "\n".join(lines)
 
     # 保存
-    report_path = PROJECT_ROOT / "output" / "reports" / f"report_{date_str}.md"
-    report_path.parent.mkdir(parents=True, exist_ok=True)
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    report_path = OUTPUT_DIR / f"report_{date_str}.md"
     report_path.write_text(report_md, encoding="utf-8")
 
+    print(f"[日报] 已生成: {report_path}")
+    print(f"[提示] 日报包含分析框架，可用 Claude Code 填充分析内容")
     return str(report_path)
+
+
+# === 交互式分析（在 Claude Code 会话中使用）===
+
+def generate_analysis_prompt(signals, date_str=None):
+    """生成供 Claude Code 会话使用的分析 prompt"""
+    if date_str is None:
+        date_str = datetime.now().strftime("%Y-%m-%d")
+
+    by_industry = defaultdict(list)
+    for s in signals:
+        by_industry[s.get("industry_name", "其他")].append(s)
+
+    prompt_lines = [
+        f"请对以下 {len(signals)} 条行业信号进行深度分析，生成日报。",
+        f"",
+        f"对每条信号，用 MCP 搜索工具（ddg + bing）做交叉验证后，按以下6个维度输出分析：",
+        f"1. 事实确认：信号是否可靠？多源验证结果？",
+        f"2. 商业解读：为什么重要？背后的商业逻辑？",
+        f"3. 机会评估：个人/小团队有什么机会？市场规模？入场时机？",
+        f"4. 行动建议：具体可做什么？第一步？需要什么资源？",
+        f"5. 风险提示：不确定因素？可能风险？",
+        f"6. 持续追踪：接下来需要关注什么指标？",
+        f"",
+        f"---",
+        f"",
+    ]
+
+    for i, s in enumerate(signals, 1):
+        prompt_lines.append(
+            f"### 信号{i}: [{s.get('score', 0):.1f}分] [{s.get('signal_type_name', '')}] "
+            f"{s.get('title', '')}"
+        )
+        prompt_lines.append(f"行业: {s.get('industry_name', '')} | 来源: {s.get('source_name', '')}")
+        prompt_lines.append(f"链接: {s.get('url', '')}")
+        if s.get('snippet'):
+            prompt_lines.append(f"摘要: {s.get('snippet', '')}")
+        prompt_lines.append("")
+
+    prompt_lines.append("---")
+    prompt_lines.append("请将分析结果写入 D:/claude产出/industry-radar/reports/report_{date_str}.md")
+
+    return "\n".join(prompt_lines)
 
 
 if __name__ == "__main__":
     test_signals = [
-        {"title": "DeepSeek开源新模型", "industry_name": "AI/大模型", "signal_type_name": "技术端", "score": 9.2, "snippet": "API价格骤降", "url": "https://example.com/1", "source_name": "GitHub Trending", "metadata": {}, "category": "tech_communities"},
-        {"title": "东南亚电商风口", "industry_name": "出海/跨境", "signal_type_name": "机会端", "score": 8.8, "snippet": "新政策红利", "url": "https://example.com/2", "source_name": "36氪", "metadata": {}, "category": "policy_media"},
+        {"title": "DeepSeek开源新模型性能直逼GPT-5，API价格骤降80%",
+         "industry_name": "AI/大模型", "signal_type_name": "技术端", "score": 9.2,
+         "snippet": "API价格骤降80%", "url": "https://example.com/1",
+         "source_name": "GitHub Trending", "metadata": {"stars": 5000}},
+        {"title": "Boss直聘AI岗位同比+150%，大模型工程师月薪中位数45K",
+         "industry_name": "AI/大模型", "signal_type_name": "需求端", "score": 8.5,
+         "snippet": "AI岗位暴增", "url": "https://example.com/2",
+         "source_name": "Boss直聘", "metadata": {"job_count": 5000}},
+        {"title": "东南亚跨境电商新政策出台，中国卖家注册量单月暴增300%",
+         "industry_name": "出海/跨境", "signal_type_name": "机会端", "score": 8.8,
+         "snippet": "跨境电商新政策", "url": "https://example.com/3",
+         "source_name": "36氪", "metadata": {}},
     ]
-    path = analyze_signals(test_signals, "2026-05-27")
+    path = analyze_signals(test_signals, "2026-05-28")
     print(f"\n日报: {path}")
