@@ -103,7 +103,7 @@ def generate_brief(signals, date_str=None):
     brief_md = "\n".join(lines)
 
     # 保存
-    brief_path = PROJECT_ROOT / "output" / "briefs" / f"brief_{date_str}.md"
+    brief_path = Path("D:/claude产出/industry-radar/briefs") / f"brief_{date_str}.md"
     brief_path.parent.mkdir(parents=True, exist_ok=True)
     brief_path.write_text(brief_md, encoding="utf-8")
 

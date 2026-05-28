@@ -220,10 +220,10 @@ print(f"类型: {dict(types)}")
 
 # 保存
 date_str = datetime.now().strftime("%Y-%m-%d")
-Path("output/raw").mkdir(parents=True, exist_ok=True)
-with open(f"output/raw/signals_{date_str}.json", "w", encoding="utf-8") as f:
+Path("D:/claude产出/industry-radar/raw").mkdir(parents=True, exist_ok=True)
+with open(f"D:/claude产出/industry-radar/raw/signals_{date_str}.json", "w", encoding="utf-8") as f:
     json.dump(signals, f, ensure_ascii=False, indent=2)
-with open(f"output/raw/processed_{date_str}.json", "w", encoding="utf-8") as f:
+with open(f"D:/claude产出/industry-radar/raw/processed_{date_str}.json", "w", encoding="utf-8") as f:
     json.dump(scored, f, ensure_ascii=False, indent=2)
 
 # 晨报
