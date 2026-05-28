@@ -144,6 +144,48 @@ def _weibo_hot():
     return signals
 
 
+def _xueqiu_hot():
+    """雪球热帖 — 需先获取cookie"""
+    signals = []
+    try:
+        sess = requests.Session()
+        sess.get("https://xueqiu.com/", headers=HEADERS, timeout=15)
+        resp = sess.get(
+            "https://xueqiu.com/statuses/hot/listV2.json",
+            params={"since_id": -1, "max_id": -1, "size": 15},
+            headers={**HEADERS, "Referer": "https://xueqiu.com/"},
+            timeout=15
+        )
+        if resp.status_code != 200:
+            return signals
+        for item in resp.json().get("items", []):
+            os = item.get("original_status", {})
+            if not os:
+                continue
+            title = os.get("title", "") or os.get("description", "")
+            if not title:
+                title = re.sub(r'<[^>]+>', '', os.get("text", "")).strip()[:80]
+            if title and len(title) > 3:
+                signals.append(make_signal(
+                    title=title[:120],
+                    url=f"https://xueqiu.com{item.get('target','')}" if item.get('target') else f"https://xueqiu.com/statuses/{os.get('id','')}",
+                    source="xueqiu",
+                    source_name="雪球",
+                    category="search_trends",
+                    language="zh",
+                    snippet=re.sub(r'<[^>]+>', '', os.get("text", "")).strip()[:150],
+                    raw_text=f"{title}",
+                    metadata={
+                        "reply_count": os.get("reply_count", 0),
+                        "retweet_count": os.get("retweet_count", 0),
+                        "user": os.get("user", {}).get("screen_name", "")
+                    }
+                ))
+    except Exception as e:
+        print(f"   雪球异常: {e}")
+    return signals
+
+
 def collect_search_trends():
     """采集所有搜索趋势信号源"""
     import yaml

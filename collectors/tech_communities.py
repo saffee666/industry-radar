@@ -234,6 +234,42 @@ def _v2ex(tab="creative"):
     return signals
 
 
+def _juejin():
+    """掘金 — 推荐feed API，无需登录"""
+    signals = []
+    try:
+        resp = requests.post(
+            "https://api.juejin.cn/recommend_api/v1/article/recommend_all_feed",
+            json={"id_type": 2, "sort_type": 200, "cursor": "0", "limit": 20},
+            headers={**HEADERS, "Content-Type": "application/json"},
+            timeout=15
+        )
+        if resp.status_code != 200:
+            return signals
+        data = resp.json()
+        if data.get("err_no") != 0:
+            return signals
+        for item in data.get("data", []):
+            info = item.get("item_info", {}).get("article_info", {})
+            title = info.get("title", "")
+            article_id = info.get("article_id", "")
+            if title:
+                signals.append(make_signal(
+                    title=title,
+                    url=f"https://juejin.cn/post/{article_id}",
+                    source="juejin",
+                    source_name="掘金",
+                    category="tech_communities",
+                    language="zh",
+                    snippet=info.get("brief_content", "")[:150],
+                    raw_text=f"{title} {info.get('brief_content', '')}",
+                    metadata={"user": info.get("user_name", ""), "category": info.get("category_name", "")}
+                ))
+    except Exception as e:
+        print(f"   掘金异常: {e}")
+    return signals
+
+
 def collect_tech_communities():
     """采集所有技术社区信号源"""
     sources = _load_sources()
@@ -245,6 +281,7 @@ def collect_tech_communities():
         "producthunt": _producthunt,
         "v2ex_create": lambda: _v2ex("creative"),
         "v2ex_share": lambda: _v2ex("share"),
+        "juejin": _juejin,
     }
 
     for src in sources:

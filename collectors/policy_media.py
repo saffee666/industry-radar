@@ -91,9 +91,69 @@ def _36kr():
 
 
 def _huxiu():
-    """虎嗅 — 暂不可用(阿里云IP被WAF拦截)"""
-    print("   虎嗅: 阿里云IP被WAF拦截，已跳过")
-    return []
+    """虎嗅 — 暂不可用(WAF拦截)"""
+    signals = []
+    try:
+        import xml.etree.ElementTree as ET
+        resp = requests.get("https://www.huxiu.com/rss/0.xml", headers=HEADERS, timeout=15)
+        if resp.status_code == 200:
+            root = ET.fromstring(resp.text)
+            for item in list(root.iter("item"))[:20]:
+                t = item.find("title")
+                l = item.find("link")
+                d = item.find("description")
+                title = t.text.strip() if t is not None and t.text else ""
+                url = l.text.strip() if l is not None and l.text else ""
+                if title:
+                    snippet = re.sub(r'<[^>]+>', '', d.text).strip()[:150] if d is not None and d.text else ""
+                    signals.append(make_signal(
+                        title=title, url=url, source="huxiu", source_name="虎嗅",
+                        category="policy_media", language="zh",
+                        snippet=snippet, raw_text=f"{title}"
+                    ))
+    except Exception as e:
+        print(f"   虎嗅异常: {e}")
+    return signals
+
+
+def _wallstreetcn():
+    """华尔街见闻 — 实时财经快讯，公开API无需登录"""
+    signals = []
+    try:
+        resp = requests.get(
+            "https://api-one.wallstcn.com/apiv1/content/lives",
+            params={"channel": "global-channel", "limit": 30},
+            headers=HEADERS, timeout=15
+        )
+        if resp.status_code != 200:
+            return signals
+        data = resp.json()
+        if data.get("code") != 20000:
+            return signals
+        items = data.get("data", {}).get("items", [])
+        for it in items:
+            title = it.get("title", "")
+            content = it.get("content", "")
+            # 优先用title，否则用content_text提取
+            if not title:
+                content_text = it.get("content_text", "")
+                title = content_text[:80] if content_text else (re.sub(r'<[^>]+>', '', content).strip()[:80] if content else "")
+            if title:
+                snippet = re.sub(r'<[^>]+>', '', content).strip()[:150] if content else ""
+                signals.append(make_signal(
+                    title=title,
+                    url=f"https://wallstreetcn.com/lives/{it.get('id','')}",
+                    source="wallstreetcn",
+                    source_name="华尔街见闻",
+                    category="policy_media",
+                    language="zh",
+                    snippet=snippet,
+                    raw_text=f"{title} {snippet}",
+                    metadata={"publish_time": it.get("display_time", "")}
+                ))
+    except Exception as e:
+        print(f"   华尔街见闻异常: {e}")
+    return signals
 
 
 def _ifanr():

@@ -147,6 +147,42 @@ try:
 except Exception as e:
     print(f"  猪八戒: 失败 - {e}")
 
+# 掘金
+try:
+    from collectors.tech_communities import _juejin
+    s = _juejin()
+    signals.extend([x.to_dict() if hasattr(x, "to_dict") else x for x in s])
+    print(f"  掘金: {len(s)} 条")
+except Exception as e:
+    print(f"  掘金: 失败 - {e}")
+
+# 华尔街见闻
+try:
+    from collectors.policy_media import _wallstreetcn
+    s = _wallstreetcn()
+    signals.extend([x.to_dict() if hasattr(x, "to_dict") else x for x in s])
+    print(f"  华尔街见闻: {len(s)} 条")
+except Exception as e:
+    print(f"  华尔街见闻: 失败 - {e}")
+
+# 雪球
+try:
+    from collectors.search_trends import _xueqiu_hot
+    s = _xueqiu_hot()
+    signals.extend([x.to_dict() if hasattr(x, "to_dict") else x for x in s])
+    print(f"  雪球: {len(s)} 条")
+except Exception as e:
+    print(f"  雪球: 失败 - {e}")
+
+# 虎嗅
+try:
+    from collectors.policy_media import _huxiu
+    s = _huxiu()
+    signals.extend([x.to_dict() if hasattr(x, "to_dict") else x for x in s])
+    print(f"  虎嗅: {len(s)} 条")
+except Exception as e:
+    print(f"  虎嗅: 失败 - {e}")
+
 # Product Hunt（需cookie）
 try:
     from collectors.tech_communities import _producthunt
