@@ -148,6 +148,61 @@ def _jike():
     return signals
 
 
+def _douyin_hot():
+    """抖音热搜榜 — 公开API，无需登录"""
+    signals = []
+    try:
+        resp = requests.get(
+            "https://www.douyin.com/aweme/v1/web/hot/search/list/?detail_list=1",
+            headers={**HEADERS, "Referer": "https://www.douyin.com/"},
+            timeout=15
+        )
+        if resp.status_code != 200:
+            return signals
+        data = resp.json()
+        word_list = data.get("data", {}).get("word_list", [])
+        trending = data.get("data", {}).get("trending_list", [])
+        seen = set()
+
+        for item in word_list[:40]:
+            word = item.get("word", "")
+            if not word or word in seen:
+                continue
+            seen.add(word)
+            hot = item.get("hot_value", 0)
+            signals.append(make_signal(
+                title=f"抖音热搜: {word}",
+                url=f"https://www.douyin.com/search/{word}",
+                source="douyin_hot",
+                source_name="抖音热搜",
+                category="chinese_platforms",
+                language="zh",
+                snippet=f"热度值: {hot}, 视频数: {item.get('video_count', 0)}",
+                raw_text=word,
+                metadata={"hot_value": hot, "video_count": item.get("video_count", 0), "position": item.get("position", 0)}
+            ))
+
+        for item in trending[:5]:
+            word = item.get("word", "")
+            if not word or word in seen:
+                continue
+            seen.add(word)
+            signals.append(make_signal(
+                title=f"抖音上升: {word}",
+                url=f"https://www.douyin.com/search/{word}",
+                source="douyin_trending",
+                source_name="抖音上升热点",
+                category="chinese_platforms",
+                language="zh",
+                snippet=f"实时上升热点，热度: {item.get('hot_value', 0)}",
+                raw_text=word,
+                metadata={"hot_value": item.get("hot_value", 0), "trending": True}
+            ))
+    except Exception as e:
+        print(f"   抖音异常: {e}")
+    return signals
+
+
 def collect_chinese_platforms():
     """采集所有中文平台信号源"""
     import yaml
@@ -162,6 +217,7 @@ def collect_chinese_platforms():
         "bilibili_hot": _bilibili_hot,
         "sspai": _sspai,
         "jike_product": _jike,
+        "douyin_hot": _douyin_hot,
     }
 
     for src in sources:

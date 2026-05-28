@@ -64,6 +64,15 @@ try:
 except Exception as e:
     print(f"  百度热搜: 失败 - {e}")
 
+# 抖音热搜
+try:
+    from collectors.chinese_platforms import _douyin_hot
+    s = _douyin_hot()
+    signals.extend([x.to_dict() if hasattr(x, "to_dict") else x for x in s])
+    print(f"  抖音热搜: {len(s)} 条")
+except Exception as e:
+    print(f"  抖音热搜: 失败 - {e}")
+
 # GitHub Trending
 try:
     from collectors.tech_communities import _gh_trending
