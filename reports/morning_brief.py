@@ -73,7 +73,7 @@ def generate_brief(signals, date_str=None):
 
         lines.append(f"## {emoji} {section_title} ({len(display)} 条)")
         if omitted > 0:
-            lines.append(f"> 另有 {omitted} 条未展示，完整数据见 output/raw/")
+            lines.append(f"> 另有 {omitted} 条未展示，完整数据见 D:/claude产出/industry-radar/raw/")
         lines.append("")
         lines.append("| # | 行业 | 类型 | 标题 | 评分 |")
         lines.append("|---|------|------|------|------|")
