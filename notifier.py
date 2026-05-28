@@ -71,24 +71,40 @@ def push_morning_brief(scored_signals, date_str=None):
     lines.append(f"**信号类型**: {type_summary}")
     lines.append("")
 
-    # 高优信号列表（最多8条）
+    # 高优信号（全部展示，因为这是手机上最重要的内容）
     if high:
         lines.append("---")
         lines.append("")
-        lines.append("## 高优信号")
+        lines.append(f"## 高优信号 ({len(high)}条)")
         lines.append("")
-        for i, s in enumerate(high[:8], 1):
-            title = s.get("title", "")[:50]
+        for i, s in enumerate(high[:10], 1):
+            title = s.get("title", "")[:55]
             score = s.get("score", 0)
             ind = s.get("industry_name", "")
             stype = s.get("signal_type_name", "")
-            lines.append(f"{i}. <font color=\"info\">[{score:.1f}]</font> [{ind}] [{stype}] {title}")
+            url = s.get("url", "")
+            if url:
+                lines.append(f"{i}. <font color=\"info\">[{score:.1f}]</font> [{ind}] [{stype}] [{title}]({url})")
+            else:
+                lines.append(f"{i}. <font color=\"info\">[{score:.1f}]</font> [{ind}] [{stype}] {title}")
+        if len(high) > 10:
+            lines.append(f"> 还有 {len(high) - 10} 条高优信号，见完整晨报")
+
+    # 中优信号（挑前5条）
+    if mid and len(high) <= 5:
+        lines.append("")
+        lines.append(f"## 中优信号 ({len(mid)}条，前5)")
+        lines.append("")
+        for i, s in enumerate(mid[:5], 1):
+            title = s.get("title", "")[:50]
+            score = s.get("score", 0)
+            ind = s.get("industry_name", "")
+            lines.append(f"{i}. [{score:.1f}] [{ind}] {title}")
 
     lines.append("")
     brief_path = f"D:/claude产出/industry-radar/briefs/brief_{date_str}.md"
-    lines.append(f"[查看完整晨报](file:///{brief_path.replace(' ', '%20')})")
-    lines.append("")
-    lines.append(f"> {datetime.now().strftime('%H:%M')} 自动生成 | repo: [industry-radar](https://github.com/saffee666/industry-radar)")
+    lines.append(f"> 完整 {total} 条信号晨报: `{brief_path}`")
+    lines.append(f"> {datetime.now().strftime('%H:%M')} 自动生成 · [GitHub](https://github.com/saffee666/industry-radar)")
 
     content = "\n".join(lines)
 
@@ -109,9 +125,7 @@ def push_report_ready(report_path, signal_count, date_str=None):
         f"# 深度日报已生成 — {date_str}",
         "",
         f"分析了 **{signal_count}** 条信号",
-        f"报告路径: `{str(path)}`",
-        "",
-        "[打开报告](file:///{})".format(str(path).replace(" ", "%20").replace("\\", "/")),
+        f"报告: `{str(path)}`",
     ]
     send_markdown("\n".join(lines))
 
