@@ -231,4 +231,12 @@ from reports.morning_brief import generate_brief
 brief_path = generate_brief(scored, date_str)
 print(f"晨报: {brief_path}")
 
+# 微信推送
+try:
+    from notifier import push_morning_brief
+    push_morning_brief(scored, date_str)
+    print(f"微信推送: 完成")
+except Exception as e:
+    print(f"微信推送: 失败 - {e}")
+
 print(f"[{datetime.now()}] 采集完成")
