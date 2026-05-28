@@ -29,7 +29,33 @@ def _36kr():
             timeout=15
         )
         if resp.status_code == 200:
-            root = ET.fromstring(resp.text)
+            try:
+                root = ET.fromstring(resp.text)
+            except ET.ParseError:
+                # XML偶尔有非法字符，清洗后重试
+                cleaned = re.sub(r'[^\x09\x0A\x0D\x20-\x7E\x80-\xFF]', '', resp.text)
+                try:
+                    root = ET.fromstring(cleaned)
+                except ET.ParseError:
+                    # 回退到正则提取
+                    items = re.findall(r'<item>(.*?)</item>', resp.text, re.DOTALL)
+                    for item_text in items[:25]:
+                        t = re.search(r'<title>(.*?)</title>', item_text)
+                        l = re.search(r'<link>(.*?)</link>', item_text)
+                        d = re.search(r'<description>(.*?)</description>', item_text)
+                        p = re.search(r'<pubDate>(.*?)</pubDate>', item_text)
+                        title = t.group(1).strip() if t else ""
+                        url = l.group(1).strip() if l else ""
+                        if title:
+                            url = re.sub(r'\?f=rss$', '', url) if url else ""
+                            snippet = re.sub(r'<[^>]+>', '', d.group(1)).strip()[:150] if d else ""
+                            signals.append(make_signal(
+                                title=title, url=url, source="36kr", source_name="36氪",
+                                category="policy_media", language="zh",
+                                snippet=snippet, raw_text=f"{title}",
+                                metadata={"publish_time": p.group(1) if p else ""}
+                            ))
+                    return signals
             for item in list(root.iter("item"))[:25]:
                 title_el = item.find("title")
                 link_el = item.find("link")
