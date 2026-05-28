@@ -1,6 +1,8 @@
 """招聘市场采集器: Boss直聘, 猎聘"""
 
 import re
+import time
+import random
 import requests
 from pathlib import Path
 from .base import make_signal
@@ -9,6 +11,8 @@ CONFIG_PATH = Path(__file__).parent.parent / "config" / "sources.yaml"
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
 }
+
+MOBILE_UA = "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1"
 
 
 def _load_sources():
@@ -28,13 +32,24 @@ def _boss():
     cities = {"101030100": "上海", "101280600": "深圳", "101210100": "杭州", "101280100": "广州", "101200100": "武汉", "101230100": "福州"}
 
     for city_code, city_name in cities.items():
+        time.sleep(random.uniform(2, 5))
         try:
+            # 先试移动UA（云服务器IP更容易过）
             resp = requests.get(
                 "https://www.zhipin.com/wapi/zpgeek/search/job/seo/data.json",
                 params={"city": city_code, "jobCity": city_code},
-                headers={**HEADERS, "Referer": "https://www.zhipin.com/"},
+                headers={"User-Agent": MOBILE_UA, "Referer": "https://www.zhipin.com/"},
                 timeout=15
             )
+            if resp.status_code == 200 and resp.json().get("code") == 35:
+                # 移动UA也被封，再试桌面UA
+                time.sleep(2)
+                resp = requests.get(
+                    "https://www.zhipin.com/wapi/zpgeek/search/job/seo/data.json",
+                    params={"city": city_code, "jobCity": city_code},
+                    headers={**HEADERS, "Referer": "https://www.zhipin.com/"},
+                    timeout=15
+                )
             if resp.status_code != 200:
                 print(f"    Boss[{city_name}] HTTP {resp.status_code}")
                 continue
