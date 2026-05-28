@@ -1,0 +1,300 @@
+# 行业分类关键词库
+# 每个行业包含中文关键词和英文关键词，用于信号自动分类
+
+industries:
+  ai:
+    name: "AI/大模型"
+    keywords_cn:
+      - "大模型|大语言模型|LLM|语言模型"
+      - "GPT|Claude|Gemini|DeepSeek|通义|文心|豆包|Kimi|智谱|百川|月之暗面|MiniMax|阶跃星辰|零一万物"
+      - "AI Agent|智能体|AI代理|自主代理"
+      - "AIGC|AI生成|人工智能生成"
+      - "深度学习|机器学习|神经网络|Transformer|扩散模型"
+      - "向量数据库|RAG|检索增强|embedding"
+      - "提示词|prompt|提示工程"
+      - "模型训练|微调|fine.?tuning|预训练"
+      - "推理|inference|算力|GPU|H100|A100"
+      - "开源模型|open.?source.*model|开源大模型"
+      - "多模态|视觉模型|语音模型|视频生成"
+      - "AI|人工智能|artificial intelligence|机器学习"
+      - "算法工程师|NLP|CV|自然语言|计算机视觉"
+      - "机器学习|深度学习|数据科学家|数据标注"
+      - "神经网络|neural|chatbot|聊天机器人"
+      - "商汤|旷视|科大讯飞|第四范式|思必驰|依图|云从"
+      - "TensorFlow|PyTorch|JAX|HuggingFace"
+      - "自动驾驶|无人驾驶|智能驾驶|ADAS"
+      - "机器人|具身智能|人形机器人"
+    keywords_en:
+      - "large language model|LLM|GPT|Claude|Gemini"
+      - "AI agent|autonomous agent"
+      - "open source model|foundation model"
+      - "fine.?tuning|RLHF|alignment"
+      - "vector database|RAG|embeddings"
+      - "multimodal|vision model|video generation"
+      - "AI|artificial intelligence|machine learning"
+      - "neural|deep learning|NLP|computer vision"
+      - "text.to.speech|speech.to.text|voice.*model"
+      - "coding agent|agent.*team|agent.*platform"
+      - "AI.*workflow|AI.*tool|AI.*assistant"
+
+  ecommerce:
+    name: "电商/零售"
+    keywords_cn:
+      - "电商|电子商务|直播带货|直播电商"
+      - "淘宝|天猫|京东|拼多多|抖音电商|快手电商|小红书电商"
+      - "跨境电商|出海电商|DTC|独立站"
+      - "私域|私域流量|社群运营"
+      - "供应链|仓储|物流|配送"
+      - "品牌出海|亚马逊|Shopee|Lazada|TikTok.*Shop"
+      - "全托管|半托管|一件代发"
+      - "即时零售|社区团购|前置仓"
+      - "美团|饿了么|盒马|顺丰|菜鸟|达达|闪送"
+      - "零食|折扣店|奥特乐|好特卖|零食很忙"
+      - "外卖|O2O|本地生活|同城零售"
+    keywords_en:
+      - "e.?commerce|DTC|direct.to.consumer"
+      - "Amazon|Shopify|Shopee|TikTok Shop"
+      - "dropshipping|cross.?border.*commerce"
+      - "supply chain|logistics|fulfillment"
+
+  web3:
+    name: "Web3/Crypto"
+    keywords_cn:
+      - "区块链|加密货币|数字货币|虚拟货币"
+      - "比特币|Bitcoin|以太坊|Ethereum|Solana"
+      - "DeFi|去中心化金融|DEX|借贷协议"
+      - "NFT|数字藏品|数字资产"
+      - "智能合约|Solidity|Rust.*合约"
+      - "Layer.?2|L2|Rollup|ZK"
+      - "DAO|去中心化自治"
+      - "钱包|Metamask|链上|链游|GameFi"
+      - "Meme币|MEME|土狗"
+    keywords_en:
+      - "blockchain|crypto|DeFi|NFT|Web3"
+      - "Bitcoin|Ethereum|Solana|Layer.?2"
+      - "smart contract|DAO|wallet|token"
+
+  content:
+    name: "短剧/内容产业"
+    keywords_cn:
+      - "短剧|微短剧|竖屏剧|小程序剧|漫剧"
+      - "AI短剧|AI视频|AI动画|AI影视"
+      - "内容创作|自媒体|短视频|直播"
+      - "网文|小说|IP改编|版权"
+      - "抖音|快手|B站|小红书.*内容|视频号"
+      - "播客|音频|有声书|知识付费"
+      - "MCN|达人|KOL|网红|博主"
+      - "剧本|编剧|导演|制作|后期"
+      - "新媒体|内容运营|编辑|文案|策划"
+      - "视频剪辑|拍摄|摄影|后期制作|特效"
+      - "字幕|配音|翻译|字幕组"
+      - "自媒体运营|公众号|头条号|百家号"
+    keywords_en:
+      - "short drama|micro.drama|vertical series"
+      - "content creator|influencer|KOL|MCN"
+      - "AI video|text.to.video|video generation"
+      - "podcast|audio content|subscription content"
+      - "video.*editing|content.*platform|creator.*tool"
+
+  saas:
+    name: "SaaS/企服"
+    keywords_cn:
+      - "SaaS|软件即服务|企业服务|B2B"
+      - "企服|企业级|to.?B|toB"
+      - "CRM|ERP|OA|协同办公|项目管理"
+      - "低代码|无代码|零代码|low.?code|no.?code"
+      - "PLG|产品驱动增长|销售驱动"
+      - "API|开发者工具|DevTools|开源商业化"
+      - "云原生|容器|Kubernetes|微服务|Serverless"
+      - "数据分析|BI|数据仓库|数据湖|ETL"
+      - "华为|腾讯|阿里巴巴|字节跳动|网易|百度|蚂蚁集团|中科曙光|中兴|浪潮|海康威视|大华|深信服|金山|用友|金蝶"
+      - "软件外包|IT服务|系统集成|信息化|数字化转型"
+      - "客服系统|工单系统|SCRM|CDP|MA.*工具|营销自动化"
+      - "办公协作|视频会议|在线文档|云盘|企业网盘"
+      - "数据库|MySQL|PostgreSQL|MongoDB|Redis|ClickHouse"
+      - "软件工程师|开发工程师|程序员|前端|后端|全栈|测试"
+      - "Java|Python|Go|Rust|JavaScript|TypeScript|React|Vue"
+      - "后端开发|前端开发|全栈开发|移动开发|测试开发"
+      - "golang|typescript|javascript|python|java|rust"
+      - "后端工程师|前端工程师|iOS|Android.*开发|鸿蒙"
+      - "架构师|技术总监|CTO|运维|DevOps|SRE"
+      - "平台开发|系统开发|工具开发|SDK"
+    keywords_en:
+      - "SaaS|B2B|enterprise|PLG|DevTools"
+      - "open source.*commercial|OSS.*business"
+      - "low.?code|no.?code|API.*platform"
+      - "cloud native|Kubernetes|serverless"
+      - "developer.*tool|productivity.*tool|workflow"
+      - "open.?source|CLI.*tool|SDK|library|framework"
+      - "dev.*platform|developer.*platform|coding.*platform"
+
+  overseas:
+    name: "出海/跨境"
+    keywords_cn:
+      - "出海|全球化|国际化|海外市场|出海企业"
+      - "东南亚|中东|拉美|非洲|印度|日韩|欧美"
+      - "跨境电商|品牌出海|游戏出海|工具出海"
+      - "本地化|本地化运营|文化差异|合规"
+      - "跨境支付|国际物流|海外仓"
+      - "汇率|关税|贸易政策|出口管制"
+    keywords_en:
+      - "global.*expansion|internationalization|cross.?border"
+      - "Southeast Asia|Middle East|Latin America|LATAM"
+      - "localization|market entry|global.*strategy"
+
+  newenergy:
+    name: "新能源/碳中和"
+    keywords_cn:
+      - "新能源|光伏|储能|电池|电动车|新能源汽车"
+      - "碳中和|碳达峰|碳交易|碳税|ESG"
+      - "锂电池|钠电池|固态电池|氢能|燃料电池"
+      - "风电|水电|核电|清洁能源|可再生能源"
+      - "充电桩|换电|智能电网|虚拟电厂"
+      - "光伏组件|逆变器|硅料|硅片"
+      - "新能源车|电动汽车|混动|插电|换电站"
+      - "储能系统|储能电站|磷酸铁锂|三元锂"
+      - "太阳能|风能|生物质能|地热|潮汐能"
+      - "宁德时代|比亚迪|特斯拉|蔚来|理想|小鹏|隆基|阳光电源|通威|晶科"
+      - "汽车制造|整车|零部件|动力电池|电驱动"
+    keywords_en:
+      - "renewable energy|solar|battery|EV|electric vehicle"
+      - "carbon neutral|ESG|energy storage|hydrogen"
+      - "clean.?energy|green.*energy|sustainability|climate"
+
+  consumer:
+    name: "消费品牌"
+    keywords_cn:
+      - "新消费|国潮|消费升级|消费降级|消费分级"
+      - "茶饮|咖啡|餐饮|食品|美妆|护肤"
+      - "宠物|宠物经济|宠物食品|宠物用品"
+      - "潮玩|盲盒|谷子|二次元|周边"
+      - "户外|露营|运动|健身|健康"
+      - "折扣零售|临期|拼团|社区商业"
+      - "喜茶|瑞幸|蜜雪冰城|霸王茶姬|奈雪|海底捞|泡泡玛特|名创优品"
+    keywords_en:
+      - "consumer brand|DTC brand|CPG|FMCG"
+      - "food.*tech|beauty.*brand|pet.*economy"
+
+  health:
+    name: "医疗健康"
+    keywords_cn:
+      - "创新药|生物医药|医疗器械|IVD|诊断"
+      - "数字医疗|远程医疗|互联网医院|在线问诊"
+      - "AI.*医疗|AI.*制药|AI.*诊断|AI.*药物"
+      - "基因编辑|细胞治疗|mRNA|ADC|双抗"
+      - "医保|集采|医疗改革|DRG|DIP"
+      - "老龄化|养老|康复|护理|慢病管理"
+      - "凯莱英|药明康德|恒瑞|迈瑞|百济神州|联影|华大|辉瑞|罗氏|默沙东"
+      - "护士|医生|药剂师|临床|医学|制药"
+    keywords_en:
+      - "biotech|pharma|medtech|digital health|telemedicine"
+      - "drug discovery|clinical trial|FDA|gene therapy"
+
+  fintech:
+    name: "金融科技"
+    keywords_cn:
+      - "金融科技|保险科技|财富科技|监管科技"
+      - "数字人民币|移动支付|跨境支付|先买后付|BNPL"
+      - "量化交易|算法交易|智能投顾|机器人理财"
+      - "数字银行|虚拟银行|开放银行|嵌入式金融"
+      - "消费金融|小微金融|供应链金融"
+      - "金融|证券|基金|保险|银行|信托|期货|外汇"
+      - "风控|征信|信贷|借贷|P2P|众筹"
+      - "股票|炒股|投资|理财|基金定投"
+      - "富途|东方财富|同花顺|蚂蚁集团|微众银行|陆金所|众安|老虎证券"
+    keywords_en:
+      - "fintech|insurtech|digital payment|BNPL"
+      - "neobank|open banking|embedded finance"
+      - "finance|trading|investing|banking|crypto"
+
+  gaming:
+    name: "游戏"
+    keywords_cn:
+      - "手游|主机游戏|PC游戏|独立游戏|3A"
+      - "游戏出海|游戏版号|游戏监管"
+      - "米哈游|腾讯游戏|网易游戏|鹰角|库洛"
+      - "AI.*游戏|游戏.*AI|NPC.*AI|AI生成.*游戏"
+      - "UGC游戏|Roblox|元宇宙|开放世界"
+      - "电竞|电子竞技|直播游戏|云游戏"
+      - "游戏开发|游戏策划|游戏美术|游戏运营|游戏设计"
+      - "游戏UI|游戏引擎|Unity|Unreal|UE5|Cocos"
+      - "动作游戏|射击|RPG|策略游戏|休闲游戏"
+    keywords_en:
+      - "gaming|video game|mobile game|AAA game"
+      - "game.*industry|esports|cloud gaming|UGC"
+      - "game.*engine|Unity|Unreal.*Engine"
+      - "indie game|game.*developer|game.*design"
+
+  education:
+    name: "教育/知识服务"
+    keywords_cn:
+      - "在线教育|教育科技|EdTech|AI.*教育"
+      - "职业教育|技能培训|考证|考公|考研"
+      - "知识付费|付费社群|训练营|课程"
+      - "素质教育|编程教育|少儿编程"
+      - "终身学习|成人教育|企业培训"
+    keywords_en:
+      - "edtech|online.*learning|education.*AI"
+      - "skill.*training|coding.*bootcamp|upskilling"
+
+  other:
+    name: "其他"
+    keywords_cn: []
+    keywords_en: []
+    default: true
+
+# 信号类型分类关键词
+signal_types:
+  market:
+    name: "市场端"
+    keywords:
+      - "涨价|降价|价格波动|供需|供给|产能|库存|出货量"
+      - "市场份额|市占率|排名|超过|反超"
+      - "用户量|DAU|MAU|下载量|用户增长|用户流失"
+      - "营收|收入|利润|亏损|盈利|扭亏"
+      - "price|market.share|revenue|shipment|inventory"
+
+  demand:
+    name: "需求端"
+    keywords:
+      - "需求暴增|需求激增|供不应求|紧缺|抢购|售罄|断货"
+      - "热搜|搜索量|搜索暴涨|突然火了|爆火|出圈"
+      - "招聘|招人|急招|高薪.*聘|抢人|人才缺口|remotely"
+      - "新需求|新兴需求|增量市场|蓝海|空白市场"
+      - "demand.*surge|hiring.*spree|talent.*shortage|trending"
+
+  opportunity:
+    name: "机会端"
+    keywords:
+      - "信息差|套利|差价|红利|风口|机会|窗口期"
+      - "早期|早期项目|天使轮|种子轮|pre.?seed"
+      - "副业|兼职|freelance|外包|接单|赚钱|变现"
+      - "低成本|零成本|轻资产|小团队|独立开发|indie"
+      - "arbitrage|opportunity|early.stage|bootstrapped|side.hustle"
+
+  policy:
+    name: "政策端"
+    keywords:
+      - "政策|法规|监管|合规|牌照|许可证|资质"
+      - "补贴|退税|减免|扶持|专项资金|产业基金"
+      - "新规|禁令|限制|禁止|管控|整治|约谈"
+      - "国务院|工信部|发改委|商务部|网信办|证监会"
+      - "regulation|policy|ban|compliance|subsidy|government"
+
+  tech:
+    name: "技术端"
+    keywords:
+      - "新模型|新算法|新框架|新工具|开源|发布"
+      - "突破|首次|第一|里程碑|SOTA|state.of.the.art"
+      - "API.*发布|API.*更新|版本.*发布|正式版|GA"
+      - "论文|paper|benchmark|评测|跑分|超越"
+      - "breakthrough|release|launch|open.sourced|benchmark"
+
+  competitive:
+    name: "竞品端"
+    keywords:
+      - "融资|融资额|估值|IPO|上市|收购|并购"
+      - "裁员|解散|关闭|停运|破产|清算"
+      - "新产品|新功能|重大更新|改版|转型|pivot"
+      - "合作|战略合作|联盟|生态|开放平台"
+      - "funding|fundraising|acquisition|layoff|IPO|shutdown"

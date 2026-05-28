@@ -1,0 +1,26 @@
+# 定时调度配置
+
+schedule:
+  # 晨间抓取：每天早上 7:00
+  morning_crawl:
+    cron: "0 7 * * *"
+    description: "全源抓取 + 生成晨报"
+    phases: ["collect", "process", "brief"]
+
+  # 午间增量：每天中午 12:30（可选）
+  noon_update:
+    cron: "30 12 * * *"
+    description: "增量抓取高时效源（热搜/实时话题）"
+    phases: ["collect_incremental", "process", "brief_update"]
+    enabled: false  # V1 暂不启用
+
+  # 晚间补充：每天晚上 20:00（可选）
+  evening_update:
+    cron: "0 20 * * *"
+    description: "政策/媒体日报源抓取"
+    phases: ["collect_evening", "process", "brief_update"]
+    enabled: false  # V1 暂不启用
+
+# V1 模式下，手动运行 main.py 触发全流程
+# 部署到阿里云后启用 cron
+mode: "manual"  # manual | cron

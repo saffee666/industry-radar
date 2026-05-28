@@ -1,0 +1,298 @@
+# 信源配置
+# 每个信源定义抓取方式、URL、解析策略
+
+sources:
+  # ===== 1. 技术社区 =====
+  tech_communities:
+    - name: "GitHub Trending"
+      id: github_trending
+      url: "https://github.com/trending"
+      method: playwright  # 需要浏览器渲染
+      language: "en"
+      frequency: "daily"
+      selectors:
+        container: "article.Box-row"
+        title: "h2 a"
+        description: "p"
+        meta: ".f6 .d-inline-block"
+      enabled: true
+
+    - name: "Hacker News"
+      id: hackernews
+      url: "https://news.ycombinator.com/"
+      method: playwright
+      language: "en"
+      frequency: "daily"
+      selectors:
+        container: "tr.athing"
+        title: ".titleline a"
+        meta: ".subtext"
+      enabled: true
+
+    - name: "Product Hunt"
+      id: producthunt
+      url: "https://www.producthunt.com/"
+      method: playwright
+      language: "en"
+      frequency: "daily"
+      selectors:
+        container: "[data-test^='post-item']"
+        title: "[data-test^='post-name']"
+        description: "[data-test^='post-tagline']"
+        meta: "[data-test^='post-votes']"
+      enabled: true
+
+    - name: "V2EX 创意"
+      id: v2ex_create
+      url: "https://www.v2ex.com/?tab=creative"
+      method: playwright
+      language: "zh"
+      frequency: "daily"
+      selectors:
+        container: "div.cell.item"
+        title: "span.item_title a"
+        meta: "span.topic_info"
+      enabled: true
+
+    - name: "V2EX 分享"
+      id: v2ex_share
+      url: "https://www.v2ex.com/?tab=share"
+      method: playwright
+      language: "zh"
+      frequency: "daily"
+      selectors:
+        container: "div.cell.item"
+        title: "span.item_title a"
+        meta: "span.topic_info"
+      enabled: true
+
+  # ===== 2. 中文平台/社区 =====
+  chinese_platforms:
+    - name: "知乎热榜"
+      id: zhihu_hot
+      url: "https://www.zhihu.com/hot"
+      method: playwright
+      language: "zh"
+      frequency: "daily"
+      selectors:
+        container: ".HotList-item"
+        title: ".HotList-itemTitle"
+        description: ".HotList-itemExcerpt"
+        meta: ".HotList-itemMetrics"
+      enabled: true
+
+    - name: "B站热门"
+      id: bilibili_hot
+      url: "https://www.bilibili.com/v/popular/all"
+      method: playwright
+      language: "zh"
+      frequency: "daily"
+      selectors:
+        container: ".video-card"
+        title: ".video-name"
+        description: ".video-desc"
+        meta: ".video-stat"
+      enabled: true
+
+    - name: "即刻 产品观察"
+      id: jike_product
+      url: "https://web.okjike.com/topic/554fa1b3e4b0808b3c5e8e6a"
+      method: playwright
+      language: "zh"
+      frequency: "daily"
+      selectors:
+        container: ".post-item"
+        title: ".post-content"
+        meta: ".post-meta"
+      enabled: true
+
+    - name: "少数派"
+      id: sspai
+      url: "https://sspai.com/"
+      method: playwright
+      language: "zh"
+      frequency: "daily"
+      selectors:
+        container: ".article-card"
+        title: ".title"
+        description: ".description"
+        meta: ".meta"
+      enabled: true
+
+  # ===== 3. 交易/接单平台 =====
+  freelance_markets:
+    - name: "猪八戒 需求大厅"
+      id: zbj_demand
+      url: "https://task.zbj.com/"
+      method: playwright
+      language: "zh"
+      frequency: "daily"
+      selectors:
+        container: ".task-item"
+        title: ".task-title"
+        description: ".task-desc"
+        meta: ".task-price"
+      enabled: true
+
+    - name: "Upwork Trending Skills"
+      id: upwork_skills
+      url: "https://www.upwork.com/resources/trending-skills"
+      method: playwright
+      language: "en"
+      frequency: "weekly"
+      selectors:
+        container: ".skill-item"
+        title: "h3"
+        description: "p"
+      enabled: true
+
+  # ===== 4. 招聘市场 =====
+  job_markets:
+    - name: "Boss直聘 搜索热词"  # 通过搜索热门岗位看需求
+      id: boss_zhipin
+      url: "https://www.zhipin.com/web/geek/job"
+      method: playwright
+      language: "zh"
+      frequency: "daily"
+      search_keywords:
+        - "AI"
+        - "大模型"
+        - "出海"
+        - "短剧"
+        - "Web3"
+        - "区块链"
+        - "新能源"
+        - "跨境电商"
+      selectors:
+        container: ".job-card-wrapper"
+        title: ".job-name"
+        description: ".job-info"
+        meta: ".salary"
+      enabled: true
+
+    - name: "猎聘 热招"
+      id: liepin
+      url: "https://www.liepin.com/"
+      method: playwright
+      language: "zh"
+      frequency: "daily"
+      selectors:
+        container: ".job-list-item"
+        title: ".job-title"
+        description: ".job-info"
+        meta: ".salary"
+      enabled: true
+
+  # ===== 5. 搜索引擎趋势 =====
+  search_trends:
+    - name: "Google Trends 每日"
+      id: google_trends_daily
+      url: "https://trends.google.com/trending?geo=US&hours=24"
+      method: playwright
+      language: "en"
+      frequency: "daily"
+      selectors:
+        container: ".feed-item"
+        title: ".title"
+        description: ".summary"
+        meta: ".source"
+      enabled: true
+
+    - name: "百度热搜"
+      id: baidu_hot
+      url: "https://top.baidu.com/board?tab=realtime"
+      method: playwright
+      language: "zh"
+      frequency: "daily"
+      selectors:
+        container: ".category-wrap_iQLoo"
+        title: ".c-single-text-ellipsis"
+        description: ".desc_3CTuI"
+        meta: ".hot-index_1Bl1a"
+      enabled: true
+
+    - name: "微博热搜"
+      id: weibo_hot
+      url: "https://weibo.com/ajax/side/hotSearch"
+      method: playwright
+      language: "zh"
+      frequency: "daily"
+      selectors:
+        container: ".data"
+        title: ".list-group-item"
+      enabled: true
+
+  # ===== 6. 政策 & 行业媒体 =====
+  policy_media:
+    - name: "36氪"
+      id: 36kr
+      url: "https://36kr.com/information/technology"
+      method: playwright
+      language: "zh"
+      frequency: "daily"
+      selectors:
+        container: ".article-item-wrapper"
+        title: ".article-item-title"
+        description: ".article-item-description"
+        meta: ".article-item-info"
+      enabled: true
+
+    - name: "虎嗅"
+      id: huxiu
+      url: "https://www.huxiu.com/"
+      method: playwright
+      language: "zh"
+      frequency: "daily"
+      selectors:
+        container: ".article-item"
+        title: ".article-title"
+        description: ".article-summary"
+        meta: ".article-meta"
+      enabled: true
+
+    - name: "晚点LatePost"
+      id: latepost
+      url: "https://www.latepost.com/"
+      method: playwright
+      language: "zh"
+      frequency: "daily"
+      selectors:
+        container: ".article-item"
+        title: ".article-title"
+        description: ".article-excerpt"
+        meta: ".article-date"
+      enabled: true
+
+    - name: "TechCrunch"
+      id: techcrunch
+      url: "https://techcrunch.com/latest/"
+      method: playwright
+      language: "en"
+      frequency: "daily"
+      selectors:
+        container: ".post-block"
+        title: "h2 a"
+        description: ".post-block__content"
+        meta: ".post-block__meta"
+      enabled: true
+
+    - name: "国务院政策文件库"
+      id: gov_policy
+      url: "https://www.gov.cn/zhengce/zhengcewenjianku/"
+      method: playwright
+      language: "zh"
+      frequency: "daily"
+      selectors:
+        container: ".list-item"
+        title: ".list-item-title"
+        description: ".list-item-desc"
+        meta: ".list-item-date"
+      enabled: true
+
+# 全局采集配置
+global:
+  timeout: 30  # 秒
+  retry: 2
+  user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"
+  max_per_source: 30  # 每个源最多采集条数
+  output_dir: "output/raw"
