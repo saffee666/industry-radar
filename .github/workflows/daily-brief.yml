@@ -1,0 +1,38 @@
+name: Daily Brief
+
+on:
+  schedule:
+    # 8:00 AM China (UTC+8) = 00:00 UTC
+    - cron: "3 0 * * *"
+  workflow_dispatch:  # Manual trigger
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run pipeline
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          DEEPSEEK_BASE_URL: ${{ secrets.DEEPSEEK_BASE_URL }}
+          DEEPSEEK_MODEL: deepseek-chat
+        run: python main.py
+
+      - name: Commit brief
+        run: |
+          git config user.name "industry-radar bot"
+          git config user.email "bot@industry-radar"
+          git add briefs/ raw/
+          git diff --cached --quiet || git commit -m "daily brief $(date +%F)"
+          git push

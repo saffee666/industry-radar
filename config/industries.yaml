@@ -1,0 +1,58 @@
+industries:
+  ai:
+    name: "AI/大模型"
+    keywords:
+      - "AI,大模型,LLM,GPT,Claude,人工智能,机器学习,deep learning,agent,copilot"
+      - "智能体,开源模型,fine-tune,微调,transformer,RAG"
+    signal_types: ["demand", "supply", "market"]
+
+  content:
+    name: "短剧/内容产业"
+    keywords:
+      - "短剧,微短剧,竖屏剧,小程序剧,AI视频,AI生成,视频生成"
+      - "MCN,网红,直播,短视频,content creator,creator economy"
+    signal_types: ["demand", "supply", "market", "opportunity"]
+
+  saas:
+    name: "SaaS/企服"
+    keywords:
+      - "SaaS,企业服务,toB,B2B,低代码,no-code,自动化"
+      - "协同,协作,办公,productivity,效率工具,API,developer tools,infra"
+    signal_types: ["demand", "supply", "market", "competitor"]
+
+  newenergy:
+    name: "新能源/碳中和"
+    keywords:
+      - "新能源,光伏,储能,电池,电动车,碳中和,碳交易,ESG,绿色能源"
+    signal_types: ["policy", "market", "supply"]
+
+  consumer:
+    name: "消费品牌"
+    keywords:
+      - "消费,品牌,新消费,DTC,餐饮,茶饮,咖啡,零食,美妆"
+    signal_types: ["demand", "market", "supply"]
+
+  ecommerce:
+    name: "电商/零售"
+    keywords:
+      - "电商,直播带货,跨境电商,社交电商,TikTok Shop,Temu,Amazon,Shopify"
+    signal_types: ["demand", "market", "competitor", "opportunity"]
+
+  fintech:
+    name: "金融科技"
+    keywords:
+      - "金融科技,支付,区块链,数字货币,DeFi,crypto,stablecoin"
+      - "保险科技,理财,量化,fintech"
+    signal_types: ["policy", "market", "demand"]
+
+  overseas:
+    name: "出海/跨境"
+    keywords:
+      - "出海,跨境,全球化,东南亚,中东,拉美,日韩,欧美"
+      - "cross-border,global expansion,localization"
+    signal_types: ["demand", "market", "opportunity"]
+
+  other:
+    name: "其他"
+    keywords: []
+    signal_types: ["market"]

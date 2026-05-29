@@ -1,0 +1,74 @@
+sources:
+  github:
+    name: "GitHub Trending"
+    url: "https://github.com/trending?since=daily"
+    collector: "github"
+    category: "tech_community"
+    enabled: true
+    weight: 0.9
+
+  producthunt:
+    name: "Product Hunt"
+    url: "https://www.producthunt.com/feed?category=undefined"
+    collector: "producthunt"
+    category: "tech_community"
+    enabled: true
+    weight: 0.9
+
+  v2ex_creative:
+    name: "V2EX 创意"
+    url: "https://www.v2ex.com/?tab=creative"
+    collector: "v2ex"
+    category: "tech_community"
+    enabled: true
+    weight: 0.8
+
+  v2ex_share:
+    name: "V2EX 分享"
+    url: "https://www.v2ex.com/?tab=share"
+    collector: "v2ex"
+    category: "tech_community"
+    enabled: true
+    weight: 0.7
+
+  _36kr:
+    name: "36氪"
+    url: "https://36kr.com/feed"
+    collector: "http_rss"
+    category: "policy_media"
+    enabled: true
+    weight: 0.85
+
+  wallstreetcn:
+    name: "华尔街见闻"
+    url: "https://wallstreetcn.com/"
+    collector: "wallstreetcn"
+    category: "policy_media"
+    enabled: true
+    weight: 0.8
+
+  sspai:
+    name: "少数派"
+    url: "https://sspai.com/feed"
+    collector: "http_rss"
+    category: "tech_community"
+    enabled: true
+    weight: 0.75
+
+  weibo:
+    name: "微博热搜"
+    url: "https://weibo.com/ajax/side/hotSearch"
+    collector: "weibo"
+    category: "search_trends"
+    enabled: true         # enabled for Chinese network
+    weight: 0.4
+    max_items: 15         # only top 15, filter entertainment
+
+  douyin:
+    name: "抖音热搜"
+    url: "https://www.douyin.com/"
+    collector: "douyin"
+    category: "china_platform"
+    enabled: true         # enabled for Chinese network
+    weight: 0.4
+    max_items: 15
