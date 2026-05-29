@@ -2,8 +2,8 @@ name: Daily Brief
 
 on:
   schedule:
-    # 8:00 AM China (UTC+8) = 00:00 UTC
-    - cron: "3 0 * * *"
+    # 3:00 PM China (UTC+8) = 07:00 UTC
+    - cron: "7 7 * * *"
   workflow_dispatch:  # Manual trigger
 
 jobs:
